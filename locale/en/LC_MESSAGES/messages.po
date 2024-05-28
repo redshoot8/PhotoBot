@@ -1,0 +1,21 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "start_message"
+msgstr "Hello! Send me an image, and I'll try to guess what's on it.\nYou can choose language by /language"
+
+msgid "language_prompt"
+msgstr "Please choose a language: /en or /ru"
+
+msgid "language_set"
+msgstr "Language set to English."
+
+msgid "image_processing"
+msgstr "Image processing, please wait..."
+
+msgid "image_response"
+msgstr "In the image: \n"
+
+msgid "unknown_command"
+msgstr "Unknown command"
