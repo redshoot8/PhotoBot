@@ -50,12 +50,6 @@ async def set_language_ru(msg: Message):
     await msg.answer(_("language_set"))
 
 
-@router.message(F.content_type == ContentType.TEXT)
-async def message_handler(msg: Message):
-    """Message handler"""
-    await msg.answer("Send me an image and I try to predict what is it.")
-
-
 @router.message(F.content_type == ContentType.PHOTO)
 async def image_handler(msg: Message):
     """Image handler"""
@@ -74,16 +68,22 @@ async def image_handler(msg: Message):
 
         response = _("image_response")
         for i, (imagenet_id, label, score) in enumerate(predictions):
-            response += (f"{i + 1}. "
-                         f"{translator.translate_text(label.replace('_', ' ') + " with probability")} "
-                         f"{score * 100:.2f}%\n")
+            translated_label = translator.translate_text(label.replace('_', ' '))
+            translated_text = translator.translate_text("with probability")
+            response += f"{i + 1}. {translated_label} {translated_text} {score * 100:.2f}%\n"
 
         await msg.answer(response)
     finally:
         os.remove(image_path)  # Deleting local file
 
 
+@router.message(F.content_type == ContentType.TEXT)
+async def text_message_handler(msg: Message):
+    """Message handler"""
+    await msg.answer("Send me an image and I try to predict what is it.")
+
+
 @router.message()
-async def message_handler(msg: Message):
+async def unknown_message_handler(msg: Message):
     """Unknown command handler"""
     await msg.answer(_("unknown_command").format(user_id=msg.from_user.id))

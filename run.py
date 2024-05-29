@@ -15,7 +15,7 @@ async def main():
     if os.path.exists(dotenv_path):
         load_dotenv(dotenv_path)
     else:
-        raise FileNotFoundError
+        raise FileNotFoundError(".env file not found.")
 
     bot = Bot(token=os.getenv('BOT_TOKEN'))
     dp = Dispatcher(storage=MemoryStorage())
