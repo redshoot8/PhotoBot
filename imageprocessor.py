@@ -5,7 +5,7 @@ import numpy as np
 
 class ImageProcessor:
     """ImageProcessor class for Telegram Bot"""
-    model = tf.keras.applications.MobileNetV2(weights='imagenet')
+    model = tf.keras.applications.DenseNet121(weights='imagenet')
 
     @staticmethod
     def preprocess_image(image):

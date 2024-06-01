@@ -1,10 +1,10 @@
-import os
-import gettext
 from aiogram import Router, F
 from aiogram.types import Message, PhotoSize, ContentType
 from aiogram.filters import Command
 from imageprocessor import ImageProcessor
 from translator import TranslatorService
+import os
+import gettext
 
 # Locale files loading
 translations = {
