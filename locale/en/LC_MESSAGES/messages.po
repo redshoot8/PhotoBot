@@ -5,6 +5,9 @@ msgstr ""
 msgid "start_message"
 msgstr "Hello! Send me an image, and I'll try to guess what's on it.\nYou can choose language by /language"
 
+msgid "text_message"
+msgstr "Send me an image, and I'll try to guess what's on it.\nYou can choose language by /language"
+
 msgid "language_prompt"
 msgstr "Please choose a language: /en or /ru"
 

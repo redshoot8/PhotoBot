@@ -11,8 +11,7 @@ translations = {
     "en": gettext.translation('messages', localedir='locale', languages=['en']),
     "ru": gettext.translation('messages', localedir='locale', languages=['ru']),
 }
-# Using english language for default
-current_translation = translations["en"]
+current_translation = translations["en"]  # Using english language for default
 _ = current_translation.gettext  # Define _ as locale function
 user_languages = {}
 
@@ -20,6 +19,7 @@ router = Router()
 
 
 def set_language(user_id, lang_code):
+    """Language setting function"""
     user_languages[user_id] = lang_code
     global current_translation, _
     current_translation = translations[lang_code]
@@ -35,17 +35,20 @@ async def start_handler(msg: Message):
 
 @router.message(Command("language"))
 async def language_handler(msg: Message):
+    """Language message handler"""
     await msg.answer(_("language_prompt"))
 
 
 @router.message(Command("en"))
 async def set_language_en(msg: Message):
+    """En message handler"""
     set_language(msg.from_user.id, "en")
     await msg.answer(_("language_set"))
 
 
 @router.message(Command("ru"))
 async def set_language_ru(msg: Message):
+    """Ru message handler"""
     set_language(msg.from_user.id, "ru")
     await msg.answer(_("language_set"))
 
@@ -64,7 +67,7 @@ async def image_handler(msg: Message):
         predictions = ImageProcessor.predict_image(image_path)  # Making prediction
 
         user_lang = user_languages.get(msg.from_user.id, "en")
-        translator = TranslatorService(to_lang=user_lang)
+        translator = TranslatorService(dest=user_lang)
 
         response = _("image_response")
         for i, (imagenet_id, label, score) in enumerate(predictions):
@@ -79,11 +82,11 @@ async def image_handler(msg: Message):
 
 @router.message(F.content_type == ContentType.TEXT)
 async def text_message_handler(msg: Message):
-    """Message handler"""
-    await msg.answer("Send me an image and I try to predict what is it.")
+    """Text message handler"""
+    await msg.answer(_("text_message"))
 
 
 @router.message()
 async def unknown_message_handler(msg: Message):
-    """Unknown command handler"""
-    await msg.answer(_("unknown_command").format(user_id=msg.from_user.id))
+    """Unknown message handler"""
+    await msg.answer(_("unknown_command"))
