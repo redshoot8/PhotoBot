@@ -3,6 +3,7 @@ from aiogram.types import Message, PhotoSize, ContentType
 from aiogram.filters import Command
 from imageprocessor import ImageProcessor
 from translator import TranslatorService
+from database import Database
 import os
 import gettext
 
@@ -27,21 +28,27 @@ def set_language(user_id, lang_code):
     current_translation.install()
 
 
-@router.message(Command("start"))
+@router.message(Command('start'))
 async def start_handler(msg: Message):
     """Start message handler"""
+    db = Database()
+    if msg.from_user.id not in db.custom_query('SELECT Users.id FROM Users'):
+        db.add_user(msg.from_user.id, 'en')
+
     await msg.answer(_("start_message"))
 
 
-@router.message(Command("language"))
+@router.message(Command('language'))
 async def language_handler(msg: Message):
     """Language message handler"""
-    await msg.answer(_("language_prompt"))
+    await msg.answer(_('language_prompt'))
 
 
 @router.message(Command("en"))
 async def set_language_en(msg: Message):
     """En message handler"""
+    db = Database()
+    db.update_user(msg.from_user.id, "en")
     set_language(msg.from_user.id, "en")
     await msg.answer(_("language_set"))
 
@@ -49,6 +56,8 @@ async def set_language_en(msg: Message):
 @router.message(Command("ru"))
 async def set_language_ru(msg: Message):
     """Ru message handler"""
+    db = Database()
+    db.update_user(msg.from_user.id, "ru")
     set_language(msg.from_user.id, "ru")
     await msg.answer(_("language_set"))
 
