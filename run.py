@@ -1,8 +1,10 @@
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
+from aiogram.types import BotCommand
 from aiogram.fsm.storage.memory import MemoryStorage
 from handlers import router
 from background import keep_alive
+from middleware import LanguageMiddleware
 import asyncio
 import logging
 import os
@@ -14,12 +16,12 @@ def prepare_environment():
     if os.path.exists(dotenv_path):
         load_dotenv(dotenv_path)
     else:
-        raise FileNotFoundError(".env file not found.")
+        raise FileNotFoundError('.env file not found.')
 
 
 async def main():
     """Main function"""
-    logging.basicConfig(filename="bot_log.log",
+    logging.basicConfig(filename='bot_log.log',
                         filemode='w',
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
@@ -28,6 +30,7 @@ async def main():
 
     bot = Bot(token=os.getenv('BOT_TOKEN'))
     dp = Dispatcher(storage=MemoryStorage())
+    dp.setup_middleware(LanguageMiddleware())
     dp.include_router(router)
 
     keep_alive()

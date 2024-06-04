@@ -6,6 +6,9 @@ class Database:
         self.connection = sqlite3.connect('data/database.db')
         self.cursor = self.connection.cursor()
 
+    def __del__(self):
+        self.connection.close()
+
     def users_table(self):
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS Users (
@@ -22,9 +25,14 @@ class Database:
         self.cursor.execute('INSERT INTO Users (id, locale) VALUES (?, ?)', (user_id, user_locale))
         self.connection.commit()
 
-    def update_user(self, user_id, new_locale):
+    def update_user_locale(self, user_id, new_locale):
         self.cursor.execute('UPDATE Users SET locale = ? WHERE id = ?', (new_locale, user_id))
         self.connection.commit()
+
+    def get_user_locale(self, user_id):
+        self.cursor.execute('SELECT locale FROM Users WHERE id = ?', (user_id,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
 
     def custom_query(self, query):
         self.cursor.execute(query)

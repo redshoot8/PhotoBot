@@ -2,7 +2,7 @@ from googletrans import Translator
 
 
 class TranslatorService:
-    def __init__(self, src="en", dest="en"):
+    def __init__(self, src='en', dest='en'):
         self.translator = Translator()
         self.src = src
         self.dest = dest
