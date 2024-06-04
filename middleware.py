@@ -1,4 +1,4 @@
-from aiogram import BaseMiddleware
+from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.types import Update
 from database import Database
 import gettext
@@ -11,14 +11,13 @@ translations = {
 
 
 class LanguageMiddleware(BaseMiddleware):
-    @staticmethod
-    async def on_pre_process_update(self, update: Update):
-        if update.message:
-            user_id = update.message.from_user.id
-        elif update.callback_query:
-            user_id = update.callback_query.from_user.id
+    async def __call__(self, handler, event: Update, data: dict):
+        if event.message:
+            user_id = event.message.from_user.id
+        elif event.callback_query:
+            user_id = event.callback_query.from_user.id
         else:
-            return
+            return await handler(event, data)
 
         db = Database()
         user_locale = db.get_user_locale(user_id)
@@ -31,3 +30,5 @@ class LanguageMiddleware(BaseMiddleware):
         global _
         _ = current_translation.gettext
         current_translation.install()
+
+        return await handler(event, data)

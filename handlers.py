@@ -1,31 +1,31 @@
 from aiogram import Router, F
-from aiogram.types import Message, PhotoSize, ContentType
+from aiogram.types import Message, PhotoSize, ContentType, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from imageprocessor import ImageProcessor
 from translator import TranslatorService
 from database import Database
 import os
-import gettext
-
-# Locale files loading
-translations = {
-    'en': gettext.translation('messages', localedir='locale', languages=['en']),
-    'ru': gettext.translation('messages', localedir='locale', languages=['ru']),
-}
-current_translation = translations['en']  # Using english language for default
-_ = current_translation.gettext  # Define _ as locale function
 
 router = Router()
+global _
 
+# Define language commands keyboard
+language_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="/en"), KeyboardButton(text="/ru")]
+    ],
+    resize_keyboard=True
+)
 
-def set_language(user_id, lang_code):
-    """Language setting function"""
-    db = Database()
-    db.update_user_locale(user_id, lang_code)
-    global current_translation, _
-    current_translation = translations[lang_code]
-    _ = current_translation.gettext  # Define _ as locale function
-    current_translation.install()
+# Define main commands keyboard
+main_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Info")],
+        [KeyboardButton(text="/start")],
+        [KeyboardButton(text="/language")]
+    ],
+    resize_keyboard=True
+)
 
 
 @router.message(Command('start'))
@@ -34,41 +34,39 @@ async def start_handler(msg: Message):
     db = Database()
     user_locale = db.get_user_locale(msg.from_user.id)
 
-    if user_locale:
-        set_language(msg.from_user.id, user_locale)
-    else:
+    if user_locale is None:
         db.add_user(msg.from_user.id, 'en')
 
-    await msg.answer(_('start_message'))
+    await msg.answer(_('start_message'), reply_markup=main_keyboard)
 
 
 @router.message(Command('language'))
 async def language_handler(msg: Message):
     """Language message handler"""
-    await msg.answer(_('language_prompt'))
+    await msg.answer(_('language_prompt'), reply_markup=language_keyboard)
 
 
 @router.message(Command('en'))
 async def set_language_en(msg: Message):
     """En message handler"""
-    set_language(msg.from_user.id, 'en')
-    await msg.answer(_('language_set'))
+    db = Database()
+    db.update_user_locale(msg.from_user.id, 'en')
+    await msg.answer(_('language_set'), reply_markup=main_keyboard)
 
 
 @router.message(Command('ru'))
 async def set_language_ru(msg: Message):
     """Ru message handler"""
-    set_language(msg.from_user.id, 'ru')
-    await msg.answer(_('language_set'))
+    db = Database()
+    db.update_user_locale(msg.from_user.id, 'ru')
+    await msg.answer(_('language_set'), reply_markup=main_keyboard)
 
 
 @router.message(F.content_type == ContentType.PHOTO)
 async def image_handler(msg: Message):
     """Image handler"""
     image: PhotoSize = msg.photo[-1]  # Largest image
-
     await msg.answer(_('image_processing'))
-
     image_path = f'{image.file_id}.jpg'
     await msg.bot.download(file=image.file_id, destination=image_path)  # Downloading an image
 
@@ -94,10 +92,10 @@ async def image_handler(msg: Message):
 @router.message(F.content_type == ContentType.TEXT)
 async def text_message_handler(msg: Message):
     """Text message handler"""
-    await msg.answer(_('text_message'))
+    await msg.answer(_('text_message'), reply_markup=main_keyboard)
 
 
 @router.message()
 async def unknown_message_handler(msg: Message):
     """Unknown message handler"""
-    await msg.answer(_('unknown_command'))
+    await msg.answer(_('unknown_command'), reply_markup=main_keyboard)

@@ -30,8 +30,16 @@ async def main():
 
     bot = Bot(token=os.getenv('BOT_TOKEN'))
     dp = Dispatcher(storage=MemoryStorage())
-    dp.setup_middleware(LanguageMiddleware())
+    dp.update.middleware(LanguageMiddleware())
     dp.include_router(router)
+
+    commands = [
+        BotCommand(command="/start", description="Start the bot"),
+        BotCommand(command="/language", description="Set language"),
+        BotCommand(command="/en", description="Set language to English"),
+        BotCommand(command="/ru", description="Set language to Russian"),
+    ]
+    await bot.set_my_commands(commands)
 
     keep_alive()
     await bot.delete_webhook(drop_pending_updates=True)
