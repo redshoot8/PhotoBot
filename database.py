@@ -32,6 +32,10 @@ class Database:
     def get_user_locale(self, user_id):
         self.cursor.execute('SELECT locale FROM Users WHERE id = ?', (user_id,))
         result = self.cursor.fetchone()
+
+        if result is None:
+            self.add_user(user_id, 'en')
+
         return result[0] if result else None
 
     def custom_query(self, query):

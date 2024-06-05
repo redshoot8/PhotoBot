@@ -31,12 +31,6 @@ main_keyboard = ReplyKeyboardMarkup(
 @router.message(Command('start'))
 async def start_handler(msg: Message):
     """Start message handler"""
-    db = Database()
-    user_locale = db.get_user_locale(msg.from_user.id)
-
-    if user_locale is None:
-        db.add_user(msg.from_user.id, 'en')
-
     await msg.answer(_('start_message'), reply_markup=main_keyboard)
 
 
